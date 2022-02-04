@@ -1,29 +1,19 @@
-var graphics = {
+var screen = {
 	init: function(ram, start) {
-		// Set up the DOM elements we'll need
-		var d = document.createElement('div'),
-			c = document.createElement('canvas');
-		
-		// Set up the container for the canvas
-		d.appendChild(c);
-		
-		
-		// This works, but I'm leaving it commented out for now - playing with cc65!
-		// d.style = "position: absolute; left: 0px; top: 0px; display: flex; width: 100vw; height: 100vh; margin: 0px; padding: 0px; background: black;";
-		d.style = "position: absolute; left: 0px; top: 0px; display: flex; width: 100vw; height: 100vh; margin: 0px; padding: 0px; background: black; z-index: -1";
-		
-		
-		// d.style.display = 'none';	// for now
-		document.body.appendChild(d);
-		
 		// Set up the canvas
-		c.width = 384;
-		c.height = 256;
-		c.style = "align-self: center; margin: auto; height: 100vh; width: auto;";
-		graphics.screen = c.getContext('2d');
+		var c = document.createElement('canvas');
+		c.width = 480; c.height = 640;
+		document.body.appendChild(c);
+		screen.canvas = c.getContext('2d');
+		
+		// Define the memory variables we'll need later
+		screen.charRAM = start;
+		screen.screenRAM = start + 1024;
+		screen.colorRAM = screen.screenRAM + 400;
+		screen.spriteRAM = screen.colorRAM + 400;	// I think
 		
 		// Set up the default character set
-		graphics.defaultCharSet = [
+		screen.defaultCharSet = [
 			// Numbers
 			60,66,70,90,98,66,60,0,		// 0 ($00): 0
 			8,24,40,8,8,8,62,0,		// 1 ($01): 1
@@ -164,52 +154,48 @@ var graphics = {
 			60,66,2,12,16,0,16,0,	// 126 ($7E): Question mark
 			8,8,8,8,0,0,8,0		// 127 ($7F): Exclamation point
 		];
-		for (var i=0; i<graphics.defaultCharSet.length; i++) {
-			ram[start + i] = graphics.defaultCharSet[i];
-		}
-	
-		// Set up the screen and color RAM
-		graphics.screenRamStart = start + 384;
-		graphics.colorRamStart = graphics.screenRamStart + 384;
 		
-		// This was just for my math purposes:
-		// 1024 bytes (1K) for the characer RAM
-		// 384 bytes for screen RAM
-		// 384 bytes for color RAM
-		// 1792 (0x0700) bytes total
-		//graphics.ramRequirements = graphics.defaultCharSet.length + 768;
+		// And call reset to complete the setup
+		screen.reset(ram);
+	},
+	
+	/**
+	 * Sets up / resets the memory to its default values
+	 * @param {Uint8Array} ram The memory that stores the screen data
+	 */
+	reset: function(ram) {
+		// Set up character RAM
+		for (var i=0; i<screen.defaultCharSet.length; i++) {
+			ram[screen.charRAM + i] = screen.defaultCharSet[i];
+		}
 		
 		// Set up the default values for the screen and color RAM
-		for (var i=0; i<384; i++) {
+		for (var i=0; i<400; i++) {
 			// Color is black & white by default;
-			ram[graphics.colorRamStart + i] = 1;
+			ram[screen.colorRAM + i] = 1; // white on black
 			
 			// Screen is all empty space by default
-			js6502.ram[graphics.screenRamStart + i] = 10;
+			js6502.ram[screen.screenRAM + i] = 10;
 		}
-		
-		// Start the loop
-		requestAnimationFrame(function() {
-			graphics.step(start, ram);
-		});
 	},
-	step: function(start, ram) {
-		// Update each character
-		for (var i=0; i<24; i++) {
-			for (var j=0; j<16; j++) {
-				graphics.setChar(j, i, js6502.ram[map.screen + i * 16 + j], i * 16 + j);
+	
+	/**
+	 * Updates the screen based on what's in memory
+	 * @param {Uint8Array} ram The memory
+	 */
+	step: function(ram) {
+		for (var i=0; i<20; i++) {
+			for (var j=0; j<20; j++) {
+				// NOTE: the 10's here = the screen dimensions, in characters.
+				// The PhoneBoy 10000 has 10x10 characters, which is why both are 10
+				screen.setChar(ram, j, i, ram[screen.screenRAM + i * 20 + j], i * 20 + j);
 			}
 		}
-		
-		// Continue the loop
-		requestAnimationFrame(function() {
-			graphics.step(start, ram);
-		});
 	},
 
 	/**
 	 * Updates a character on the screen
-	 * @param {Uint8Array} ram The graphics card's RAM
+	 * @param {Uint8Array} ram The screen card's RAM
 	 * @param {number} x The horizontal ("X") coordinate of the character cell
 	 * @param {number} y The vertical ("Y") coordinate of the character cell
 	 * @param {number} n The location in ram where the character data is stored
@@ -217,17 +203,17 @@ var graphics = {
 	 * @param {number} C The location in ram where the color data is stored
 	 */
 	setChar: function(ram, x, y, n, C) {
-		var c = ram[map.color + C];
-		graphics.screen.fillStyle = graphics.getColor(c >> 4);
-		graphics.screen.fillRect(x * 16, y * 16, 16, 16);
-		graphics.screen.fillStyle = graphics.getColor(c - ((c >> 4) * 0x10));
+		var c = ram[screen.colorRAM + C];
+		screen.canvas.fillStyle = screen.getColor(c >> 4);
+		screen.canvas.fillRect(x * 16, y * 16, 16, 16);
+		screen.canvas.fillStyle = screen.getColor(c - ((c >> 4) * 0x10));
 
 		for (var i=0; i<8; i++) {
 			for (var j=0; j<8; j++) {
-				if (ram[map.charset + (n * 8) + i] & (1 << j)) {
-					//graphics.screen.fillRect(((x * 32) - (j * 4)) + 28, (y * 32) + (i * 4), 4, 4);
-					graphics.screen.fillRect(((x * 16) - (j * 2)) + 14, (y * 16) + (i * 2), 2, 2);
-					//graphics.screen.fillRect(((x * 8) - j) + 7, (y * 8) + i, 1, 1);
+				if (ram[screen.charRAM + (n * 8) + i] & (1 << j)) {
+					//screen.canvas.fillRect(((x * 32) - (j * 4)) + 28, (y * 32) + (i * 4), 4, 4);
+					screen.canvas.fillRect(((x * 16) - (j * 2)) + 14, (y * 16) + (i * 2), 2, 2);
+					//screen.canvas.fillRect(((x * 8) - j) + 7, (y * 8) + i, 1, 1);
 				}
 			}
 		}

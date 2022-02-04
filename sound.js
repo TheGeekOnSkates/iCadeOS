@@ -1,4 +1,11 @@
+/** Sound card */
 var sound = {
+	
+	/**
+	 * I have long since forgotten where I got these,
+	 * but from what I read these are sound frequencies
+	 * thatcorrespond to musical notes
+	 */
 	notes: [
 		16.35, 17.32, 18.35, 19.45, 20.60, 21.83, 23.12, 24.50, 25.96, 27.50, 29.14, 30.87,
 		32.70, 34.65, 36.71, 38.89, 41.20, 43.65, 46.25, 49.00, 51.91, 55.00, 58.27, 61.74,
@@ -10,11 +17,19 @@ var sound = {
 		2093, 2217.46, 2349.32, 2489.02, 2637.02, 2793.83, 2959.96, 3135.96, 3322.44, 3520, 3729.31, 3951.07,
 		4186.01, 4434.92, 4698.63, 4978.03, 5274.04, 5587.65, 5919.91, 6271.93, 6644.88, 7040, 7458.62, 7902.13
 	],
-	osc: [],
-	vol: [],
-	pan: [],
+	osc: [],	/* stores 8 "OscillatorrNode" objects */
+	vol: [],	/* stores 8 "GainNode" objects */
+	pan: [],	/* stores 8 "PannerNode" objects */
+	
+	/**
+	 * Initial setup
+	 * @param {Uint8Array} ram The memoey used to store sound settings
+	 * @param {number} The first memory address for sound settings
+	 * @remarks The sound card requires 32 bytes of memory to work.
+	 */
 	init: function(ram, start) {
-		// Create the synth, volume, pan, and 3 noise players
+		// Create the synth, volume and pan components
+		// TO-DO: If I can ever figure out 8-bit noise, add noise generators
 		sound.start = start;
 		sound.audio = new (AudioContext || window.webkitaudioContext)();
 		for (let i=0; i<8; i++) {
@@ -29,12 +44,17 @@ var sound = {
 		}
 		
 		// Set up the RAM so all sounds are off
-		for (let i=start; i<start+32; i++) ram[start + i] = 0;
+		sound.reset(ram);
 		sound.step(ram);
 		
 		// And start the synths!
 		for (let i=0; i<8; i++) sound.osc[i].start();
 	},
+	
+	/**
+	 * Called on a loop, this updates the sound based on settings in memory
+	 * @param {Uint8Array} ram The memoey used to store sound settings
+	 */
 	step: function(ram) {
 		if (sound.osc.length < 8) sound.init(ram, sound.start);
 		for (let i=0; i<8; i++) {
@@ -42,7 +62,7 @@ var sound = {
 			// NOTE: Yes I'm aware we're only using 2 bits here;
 			// Yes I'm aware I could conserve memory by using the other 6 for something else.
 			// If you want to build a better "sound card", have at it. :)
-			// Okay seriously tho, 24 bytes for controlling sound on a machine with 64K is not that bad.
+			// Okay seriously tho, 32 bytes for controlling sound on a machine with 64K is not that bad.
 			// And this "sound card" is already way more powerful than what most 8-bit computers were capable of (except for i.e. the C64's SID chip lol).
 			switch(ram[sound.start + (i * 4)]) {
 				case 0: sound.osc[i].type = "square"; break;
@@ -66,6 +86,16 @@ var sound = {
 			if (pos > 100) pos = 100;
 			if (b & 128) pos *= -1;
 			sound.pan[i].pan.value = pos / 100;
+		}
+	},
+	
+	/**
+	 * Resets all sound settings to zero
+	 * @param {Uint8Array} ram The memoey used to store sound settings
+	 */
+	reset: function(ram) {
+		for (let i=sound.start; i<sound.start+32; i++) {
+			ram[sound.start + i] = 0;
 		}
 	}
 };
