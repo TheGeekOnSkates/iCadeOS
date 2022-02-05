@@ -7,15 +7,15 @@ var MemoryMap = {
 				// 3936-4095 ($0F60-$0FFF): Graphics (sprite) RAM
 				// Place holder - this gives me 160 bytes for sprites; now, to see if that's reasonable :)
 	sound: 0x8000,		// ????-???? Sound RAM (placeholder)
-	input: 0xA000,		// ????-???? Input RAM and event handlers
-	storage: 0xB000,	// ????-???? Storage onthe machine (localStorage)
+	input: 0xA000,		// ????-???? (2 bytes) Input RAM and event handlers
+	storage: 0xA002,	// ????-???? Storage onthe machine (localStorage)
 	random: 0xC000,		// ???? Pseudo random number generator (placeholder)
 	tts: 0xD000,		// ????-???? Text-to-speech settings
 	gameCode: 0xE000,	// ????-???? End-developers' game code starts here
 };
 window.onload = function() {
 	js6502.init(MemoryMap.random);
-	input.init(js6502.ram);
+	input.init(js6502.ram, MemoryMap.input);
 	screen.init(js6502.ram, MemoryMap.screen, 240, 320);
 	tts.init(js6502.ram, MemoryMap.tts);
 	screen.canvas.canvas.onclick = disk.load;
