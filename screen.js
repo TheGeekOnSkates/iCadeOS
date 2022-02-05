@@ -1,16 +1,34 @@
+/**
+ * The screen uses ___ bytes, and breaks down as follows:
+ * 
+ * 
+ * 
+ */
 var screen = {
-	init: function(ram, start) {
+	
+	/**
+	 * Initial setup - creates a canvas and initializes its memory
+	 * @param {Uint8Array} The emulated computer's memory (or chip's if separate from the CPU)
+	 * @param {number} start Where graphics memory should start
+	 * @param {number} w The screen width, in pixels
+	 * @param {number} h The screen height, in pixels
+	 */
+	init: function(ram, start, w, h) {
 		// Set up the canvas
 		var c = document.createElement('canvas');
-		c.width = 480; c.height = 640;
+		c.width = w * 2; c.height = h * 2;
 		document.body.appendChild(c);
 		screen.canvas = c.getContext('2d');
+		
+		// Dimensions, in character cells
+		screen.w = w / 8;
+		screen.h = h / 8;
 		
 		// Define the memory variables we'll need later
 		screen.charRAM = start;
 		screen.screenRAM = start + 1024;
-		screen.colorRAM = screen.screenRAM + 400;
-		screen.spriteRAM = screen.colorRAM + 400;	// I think
+		screen.colorRAM = screen.screenRAM + (screen.w * screen.h);
+		screen.spriteRAM = screen.colorRAM + (screen.w * screen.h);
 		
 		// Set up the default character set
 		screen.defaultCharSet = [
@@ -155,8 +173,9 @@ var screen = {
 			8,8,8,8,0,0,8,0		// 127 ($7F): Exclamation point
 		];
 		
-		// And call reset to complete the setup
+		// And call reset and step to complete the setup
 		screen.reset(ram);
+		screen.step(ram);
 	},
 	
 	/**
@@ -170,12 +189,12 @@ var screen = {
 		}
 		
 		// Set up the default values for the screen and color RAM
-		for (var i=0; i<400; i++) {
+		for (var i=0; i<(screen.w * screen.h); i++) {
 			// Color is black & white by default;
 			ram[screen.colorRAM + i] = 1; // white on black
 			
 			// Screen is all empty space by default
-			js6502.ram[screen.screenRAM + i] = 10;
+			ram[screen.screenRAM + i] = 10;
 		}
 	},
 	
@@ -184,13 +203,15 @@ var screen = {
 	 * @param {Uint8Array} ram The memory
 	 */
 	step: function(ram) {
-		for (var i=0; i<20; i++) {
-			for (var j=0; j<20; j++) {
-				// NOTE: the 10's here = the screen dimensions, in characters.
-				// The PhoneBoy 10000 has 10x10 characters, which is why both are 10
-				screen.setChar(ram, j, i, ram[screen.screenRAM + i * 20 + j], i * 20 + j);
+		// Draw every character on the screen
+		for (var x=0; x<screen.w; x++) {
+			for (var y=0; y<screen.h; y++) {
+				screen.setChar(ram, x, y, ram[screen.screenRAM + (y * screen.w) + x], y * screen.w + x);
 			}
 		}
+		
+		// And continue the loop
+		requestAnimationFrame(function() { screen.step(ram); });
 	},
 
 	/**
@@ -211,14 +232,12 @@ var screen = {
 		for (var i=0; i<8; i++) {
 			for (var j=0; j<8; j++) {
 				if (ram[screen.charRAM + (n * 8) + i] & (1 << j)) {
-					//screen.canvas.fillRect(((x * 32) - (j * 4)) + 28, (y * 32) + (i * 4), 4, 4);
 					screen.canvas.fillRect(((x * 16) - (j * 2)) + 14, (y * 16) + (i * 2), 2, 2);
-					//screen.canvas.fillRect(((x * 8) - j) + 7, (y * 8) + i, 1, 1);
 				}
 			}
 		}
 	},
-
+	
 	/**
 	 * Converts a color code into one of the 16 colors the system supports
 	 * @param {number} c The color code (0-15)
