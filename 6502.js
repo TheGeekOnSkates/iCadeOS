@@ -1375,6 +1375,7 @@ function testADC(value) {
 		for (var i = 0; i < js6502.SIZE; i++) { // clear ZP, stack and screen
 			js6502.ram[i] = 0x00;
 		}
+		if (js6502.onReset) js6502.onReset();
 		regA = regX = regY = 0;
 		regPC = 0x600;
 		regSP = 0xff;

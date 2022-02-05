@@ -11,25 +11,28 @@ var MemoryMap = {
 	storage: 0xA002,	// ????-???? Storage onthe machine (localStorage)
 	random: 0xC000,		// ???? Pseudo random number generator (placeholder)
 	tts: 0xD000,		// ????-???? Text-to-speech settings
-	gameCode: 0xE000,	// ????-???? End-developers' game code starts here
+	gameCode: 0xD100,	// ????-???? End-developers' game code starts here
 };
 window.onload = function() {
 	js6502.init(MemoryMap.random);
+	js6502.onReset = function() {
+		//sound.reset(js6502.ram);
+		screen.reset(js6502.ram);
+	};
 	input.init(js6502.ram, MemoryMap.input);
 	screen.init(js6502.ram, MemoryMap.screen, 240, 320);
 	tts.init(js6502.ram, MemoryMap.tts);
 	screen.canvas.canvas.onclick = disk.load;
 	var soundOn = 0;
-	disk.onload = function(data) {
+	disk.onLoad = function(data) {
 		if (!soundOn) {
-			sound.init(js6502.ram);
+			//sound.init(js6502.ram);
 			soundOn = 1;
 		}
-		screen.reset();
-		sound.reset();
-		for (var i=0; i<data.length; i++) js6502.ram[MemoryMap.gameCode + i] = data[i];
-		js6502.cpu.run(MemoryMap.gameCode);
+		js6502.cpu.load(MemoryMap.gameCode, data);
 	};
+	
+	// And start the main loop
 	setInterval(function() {
 		js6502.cpu.step();
 	}, 10);
