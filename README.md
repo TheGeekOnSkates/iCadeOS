@@ -18,24 +18,127 @@ But here's the thing (and I wish the company that made these realized this): it'
 
 At the code level, each script emulates a different thing that would actually exist on a real arcade machine.  So the components I'll have to build (or import from other projects) are:
 
-* **The CPU:** I'm going with a 6502, again for a lot of reasons I won't dive into here
 * **The screen:** I think I'll go with a 3:4 aspect ratio, since that should work on most tablets.  Probably only 16 colors, but I'd like it to have both a Commodore-style character set (which can be changed to create graphics) and sprites.  I'm not super-familiar with sprites, but I figure this gives me a chance to learn them (on the NES and C64) and see if there's a strategy there that works on the iCade.
 * **The sound chips:** In previous 8-bit projects I've built, I've had 4 to 8 independently programmable sound "voices" (and also text-to-speech); I plan to include at least those features in iCadeOS.  But ideally, I'd like to learn how ADSR works (on the C64) and see if I can add that functionality.  I've seen JS libraries that can do that, so if it's not a resource-hog it would sure make the sound a lot better.  And **MAYBE** even samples - but again, not likely (lol)
 * **A way to load ROMs:** Unlike other 80s game systems, arcade cabinets didn't have cartridges or floppy drives - at least, none that us kids could see.  Here's where iCadeOS is different.  Because it's open-source - and because developers will want to actually test their code - I need a way to load games.  I have a few ideas on this, some I've used before, others I've seen on other web emulators.
 
-And there are probably other things, but I don't know yet which ones I'll need/want.  I once built an emulator that had a way to connect to the internet - which arcade games didn't have, but might be helpful for i.e. saving high scores.  But then again there are other ways to do that (localStorage etc.).  We'll see
+#### Level 1 to-do's:
+
+##### "World 1-1": Graphics and input
+
+* Get sprites working, if possible (might involve a second canvas w/transparent background?  Not sure, but I'm kinda foreseeing the background character tiles and sprites overwriting each other every frame, creating a blinking effect lol)
+* Idea: dynamic color palette(s): 3 bytes (R, G, and B) * 16 colors = 48 bytes
+* Get it reading the iCade's controls
+* **BOSS BATTLE:** Write an Assembly program that reads player input and shows which buttons/joystick directions are currently pressed in real time.  You win if the program actually works on the iCade. :)
+
+
+##### "World 1-2": Sound and speech
+
+* Re-add my old sound system
+* Learn ADSR and see if I can get it working on the JS side
+* Re-add my old text-to-speech engine and make sure that's working
+* Idea: Research how to convert samples to a byte array and playing them from a byte array.  Might be too much work for a gimmicky feature (both for me and for other programmers who might build for this)
+* **BOSS BATTLE:** Build an Assembly program that uses sound and speech - ideally both music AND sound effects.
+
+
+##### "World 1-3": Network and local storage
+
+* Set up my localStorage wrapper
+* If I haven't already used up too much RAM, re-add my old "modem.js" from another project (I've been on the fence about it, but I kinda like the idea for people who want to store their high scores online)
+* Idea: auto-run from URL (like the Commodore PET emulator)?  Might be really hard, but might be totally awesome and totally worth it. :)
+* **BOSS BATTLE:** Write an Assembly program that uses the localStorage and modem.js if I use it.
+
+Like the other boss battles, it passes if it works on the actual iCade.
+
+
+##### "World 1-4": Misc. and Polish
+
+* Create a timer (I think I have an old script for that too)
+* Create a logo for the icon - I've been calling it iCadeOS, but it wasn't actually sponsored by the company behind the iCade (if they're even still around).  So probably just a generic arcade icon, but with a tablet icon inside that (lol).  Once the icon is done, update the HEAD tag and all that.
+* Create a nicer background on startup; maybe code a program that puts some instructions on there or something
+* Research which license to use - I really want UNLICENSE, but the 6502 piece was created under something else
+* Test the canvas with screen readers and make sure it's accessible - this system could be used to create audio games (and in fact some of the code it's running was originally built for that) so I want to make sure people who want to can do that.
+* Minify the HTML, JS, and CSS
+* **MINI-BOSS:** Write an Assembly program that uses the timer
+* **MINI-BOSS:** Finalize my memory map in wires.js, add comments to all JS code I haven't yet, and update the code to include whatever comments the license requires
+
+##### Bonus round
+
+* Try to compile a C program or two using cc65; maybe convert my program from 1-1 into C and do a speed comparison
+
+I had many other ideas (interrupts, a way to set the start address in the compiled ROM, a kernel with routines for things like muting all sound and clearing the screen, and others I've already forgotten) but that's an awful lot of feature-creep for a 1.0 :)
+
+
+
+
+#### Thoughts/research on sprites
+
+ON THE NES, there were:
+
+* 2 bits per pixel = avoid weird double-width pixels the VIC-20 and C64 had (but it also means 16 bytes for one 8x8 sprite)
+* Sprite 4 bytes for foreground sprite instances
+	x coordinate
+	y coordinate
+	which tiles
+	and a 4th byte for settings:
+		flip horizontal
+		flip vertical
+		and others the guy didn't say but I found on https://wiki.nesdev.org/w/index.php/PPU_OAM#Byte_3
+* The NES also has color palettes stored in memory, an interesting thought
+* Could handle up to 64 sprite instances
+
+I kind of like this a bit more than how the C64 did it.  Thing is tho, the Nintendo's "PPU" (an acronym that's a cheesy joke waiting to happen :D) had separate foreground and background character RAM.  I don't know if I want to waste another half-a-KB on sprites - at lesat, not unledd the developer does.
+
+Random thoughts to consider:
+* How are X and Y only 8 bits?  240 fits in 8 bits but not 320
+* On the JS side, sprites and background chars might overwrite each other in each frame, creating a weird blinking/flickering effect.  I have an idea on how to fix this if I run into it: create a second, transparent, canvas, to go over the top one; it would have its own requestAnimationFrame loop and all that... not sure if I want to go there tho.
+* Also, I had thought about using a pointer for the sprite, a 1-byte number like the character set; the charset only goes from 0-127... wait, what if setting the last bit (the 128) turned on a kind of multi-character mode like the VIC?  idk, still thinking, too tired to care. :D
+
+So based on that...
+	16 bytes for the sprite's pixels (2-bit numbers like the NES)
+		* 8 sprites = 128 bytes
+	I think one color palette is more than enough; 3 bytes per color
+		* 16 colors = 48 bytes
+	Now for sprite instances: for each instance, use 4 bytes (like the NES)
+			- 1 byte for x-coordinate
+			- 2 bytes for y-coordinate
+			- 1 byte for settings:
+				bits 0-2 (numbers 0-7): which sprite
+				bit 3: flip horizontal
+				bit 4: flip vertical
+				bit 5: double-width on/off
+				bit 6: double-height on/off
+				bit 7: Rotate
+		* 64 sprites = 256 bytes
+	The total in this setup is 128 + 48 + 256 = 432 ($01B0) bytes
+	Not exactly the nice round number I was shooting for, but it works!
+	The question is, will it slow the page to a crawl? :D
+
+On the other hand, the C64's sprites had collision registers (which would be helpful)...  I think I'm starting to over think it tho :)
+
+
+
+
+
+
+
+
+
+
+
+--------------------------------------------------------------------------
 
 ### Level 2: Build games
 
 I would love iCadeOS to have clones of games like:
 
-* Space Invaders
+* Air Hockey (Pong clone); I'll probably start here
+* Space Invaders (harder than Pong but still no crazy physics or anything)
+* Snake (I saw a version in BASIC that I think would do well here, if I can concert it to Assembly)
+* Breakout (the math is kinda tricky without floats; maybe this one will be in C)
 * Pac-Man
 * Frogger
-* Breakout
 * Tetris
-* Snake
-* Pong
 * Maybe others?
 
 In addition to being fun to build and (hopefully) fun to play, this will give me a power-up for the last level: a nice library of Assembly and C code that other developers can use to build their games.
