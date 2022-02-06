@@ -29,9 +29,8 @@ var screen = {
 		screen.screenRAM = start + 1024;
 		screen.colorRAM = screen.screenRAM + (screen.w * screen.h);
 		screen.paletteRAM = screen.colorRAM + (screen.w * screen.h);
-		screen.color3 = screen.paletteRAM + 48;
-		screen.color4 = screen.color3 + 1;
-		screen.spriteRAM = screen.color4 + 1;
+		screen.extras = screen.paletteRAM + 48;
+		screen.spriteRAM = screen.extras + 1;
 		
 		// Set up the default character set
 		screen.defaultCharSet = [
@@ -219,9 +218,12 @@ var screen = {
 			0, 127, 127,	// teal (blue-green)
 			127, 0, 127,	// purple
 		];
+		
+		// Reset the color palette and the default "extra" colors
 		for (var i=0; i<48;i++) {
 			ram[screen.paletteRAM + i] = defaultColors[i];
 		}
+		ram[screen.extras] = 0x42;	// blue and red
 	},
 	
 	/**
@@ -283,8 +285,8 @@ var screen = {
 		var colors = [
 			screen.getColor(ram, c >> 4),
 			screen.getColor(ram, c - ((c >> 4) * 0x10)),
-			screen.getColor(ram, ram[screen.color3]),
-			screen.getColor(ram, ram[screen.color4]),
+			screen.getColor(ram, ram[screen.extras] >> 4),
+			screen.getColor(ram, ram[screen.extras] - ((ram[screen.extras] >> 4) * 0x10))
 		];
 		
 		// Clear to the background color
@@ -295,11 +297,16 @@ var screen = {
 
 		// Go character-by-character, updating the entire screen
 		for (var i=0; i<8; i++) {
+			var byte = ram[screen.charRAM + (n * 8) + i];
 			for (var j=0; j<4; j++) {
-				var color = colors[screen.get2bits(n, j + 1)];
+				var color = colors[screen.get2bits(byte, j + 1)];
 				if (!color) continue;
 				screen.canvas.fillStyle = color;
-				screen.canvas.fillRect(((x * 16) - (j * 2)) + 14, (y * 16) + (i * 2), 2, 2);
+				screen.canvas.fillRect(
+					((x * 16) - (j * 4)) + 12,
+					(y * 16) + (i * 2),
+					4, 2
+				);
 			}
 		}
 	},

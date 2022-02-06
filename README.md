@@ -26,10 +26,8 @@ At the code level, each script emulates a different thing that would actually ex
 
 ##### "World 1-1": Graphics and input
 
-* Get sprites working, if possible (might involve a second canvas w/transparent background?  Not sure, but I'm kinda foreseeing the background character tiles and sprites overwriting each other every frame, creating a blinking effect lol)
-* Idea: dynamic color palette(s): 3 bytes (R, G, and B) * 16 colors = 48 bytes
-* Get it reading the iCade's controls
-* **BOSS BATTLE:** Write an Assembly program that reads player input and shows which buttons/joystick directions are currently pressed in real time.  You win if the program actually works on the iCade. :)
+* Get sprites working (collision registers would be nice, lol)
+* **BOSS BATTLE:** Update my Assembly program to use multi-color mode, sprites, a redefined character or two and a different color or two
 
 
 ##### "World 1-2": Sound and speech
@@ -68,7 +66,9 @@ Like the other boss battles, it passes if it works on the actual iCade.
 
 I had many other ideas (interrupts, a way to set the start address in the compiled ROM, a kernel with routines for things like muting all sound and clearing the screen, and others I've already forgotten) but that's an awful lot of feature-creep for a 1.0 :)
 
+##### Future 1.x releases
 
+I don't actually plan to do as much JS once I've completed level 1.  Bug fixes are one thing, but no more features.  If someone else wants to 1-up what I did, they can do that.  My code is open-source.
 
 
 #### Thoughts/research on sprites
