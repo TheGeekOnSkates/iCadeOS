@@ -4,11 +4,11 @@ var MemoryMap = {
 	screen: 512,		// 512-1535 ($0200-$05FF): Graphics (character set) RAM
 				// 1536-2735 ($0600-$0AAF): Graphics (screen) RAM
 				// 2736-3935 ($0AB0-$0F5F): Graphics (color) RAM
-				// 3936-4095 ($0F60-$0FFF): Graphics (sprite) RAM
-				// Place holder - this gives me 160 bytes for sprites; now, to see if that's reasonable :)
-	sound: 0x8000,		// ????-???? Sound RAM (placeholder)
-	input: 0xA000,		// ????-???? (2 bytes) Input RAM and event handlers
-	storage: 0xA002,	// ????-???? Storage onthe machine (localStorage)
+				// 3936-3983 ($0F60-$0F8F): Graphics (palette) RAM
+				// 3984-???? ($0F90-$????): Graphics (sprite) RAM
+	sound: 0x1000,		// ????-???? Sound RAM (placeholder)
+	input: 0x2000,		// ????-???? (2 bytes) Input RAM and event handlers
+	storage: 0x2002,	// ????-???? Storage on the machine (localStorage)
 	random: 0xC000,		// ???? Pseudo random number generator (placeholder)
 	tts: 0xD000,		// ????-???? Text-to-speech settings
 	gameCode: 0xD100,	// ????-???? End-developers' game code starts here

@@ -28,7 +28,10 @@ var screen = {
 		screen.charRAM = start;
 		screen.screenRAM = start + 1024;
 		screen.colorRAM = screen.screenRAM + (screen.w * screen.h);
-		screen.spriteRAM = screen.colorRAM + (screen.w * screen.h);
+		screen.paletteRAM = screen.colorRAM + (screen.w * screen.h);
+		screen.color3 = screen.paletteRAM + 48;
+		screen.color4 = screen.color3 + 1;
+		screen.spriteRAM = screen.color4 + 1;
 		
 		// Set up the default character set
 		screen.defaultCharSet = [
@@ -156,7 +159,7 @@ var screen = {
 			3,3,3,3,3,3,255,255,	// 112 ($70): bottom right corner (thicker)
 			0,0,0,31,31,24,24,24,	// 113 ($71): Smaller top left corner
 			0,0,0,248,248,24,24,24,	// 114 ($72): Smaller top right corner
-			24,24,24,31,31,0,0,0,	// 115 ($73): Smaller bottom right corner
+			24,24,24,31,31,0,0,0,	// 115 ($73): Smaller bottom left corner
 			24,24,24,248,248,0,0,0,	// 116 ($74): Smaller bottom right corner
 			0,0,0,255,255,24,24,24,	// 117 ($75): Like a smaller T
 			24,24,24,255,255,0,0,0,	// 118 ($76): Like a smaller upside-down T
@@ -196,6 +199,29 @@ var screen = {
 			// Screen is all empty space by default
 			ram[screen.screenRAM + i] = 10;
 		}
+		
+		// Set the default colors for the color palette
+		var defaultColors = [
+			0, 0, 0,	// black
+			255, 255, 255,	// white
+			255, 0, 0,	// red
+			0, 255, 0,	// green
+			0, 0, 255,	// blue
+			255, 255, 0,	// yellow
+			0, 255, 255,	// cyan (light blue-green)
+			255, 0, 255,	// magenta (hot pink)
+			64, 64, 64,	// gray
+			127, 127, 127,	// silver
+			127, 0, 0,	// dark red
+			0, 127, 0,	// dark green
+			0, 0, 127,	// dark blue
+			127, 127, 0,	// gold
+			0, 127, 127,	// teal (blue-green)
+			127, 0, 127,	// purple
+		];
+		for (var i=0; i<48;i++) {
+			ram[screen.paletteRAM + i] = defaultColors[i];
+		}
 	},
 	
 	/**
@@ -224,11 +250,20 @@ var screen = {
 	 * @param {number} C The location in ram where the color data is stored
 	 */
 	setChar: function(ram, x, y, n, C) {
+		// If the highest bit of the character RAM is set,
+		// Draw the character in multi-color mode
+		if (n & 128) {
+			screen.setCharMC(ram, x, y, n, C);
+			return;
+		}
+		
+		// Otherwise, do normal 2-color mode
 		var c = ram[screen.colorRAM + C];
-		screen.canvas.fillStyle = screen.getColor(c >> 4);
+		screen.canvas.fillStyle = screen.getColor(ram, c >> 4);
 		screen.canvas.fillRect(x * 16, y * 16, 16, 16);
-		screen.canvas.fillStyle = screen.getColor(c - ((c >> 4) * 0x10));
+		screen.canvas.fillStyle = screen.getColor(ram, c - ((c >> 4) * 0x10));
 
+		// Go character-by-character, updating the entire screen
 		for (var i=0; i<8; i++) {
 			for (var j=0; j<8; j++) {
 				if (ram[screen.charRAM + (n * 8) + i] & (1 << j)) {
@@ -238,29 +273,68 @@ var screen = {
 		}
 	},
 	
+	// Same as setChar except for multi-color mode
+	setCharMC: function(ram, x, y, n, C) {
+		
+		// We're in multi-color mode, so get the 4 colors
+		// They're in the order:
+		// 0=background, 1=foreground, 2=global 1, 3=global 2
+		var c = ram[screen.colorRAM + C];
+		var colors = [
+			screen.getColor(ram, c >> 4),
+			screen.getColor(ram, c - ((c >> 4) * 0x10)),
+			screen.getColor(ram, ram[screen.color3]),
+			screen.getColor(ram, ram[screen.color4]),
+		];
+		
+		// Clear to the background color
+		screen.canvas.fillStyle = colors[0];
+		screen.canvas.fillRect(x * 16, y * 16, 16, 16);
+
+		n &= ~128;	// We don't need that high-bit
+
+		// Go character-by-character, updating the entire screen
+		for (var i=0; i<8; i++) {
+			for (var j=0; j<4; j++) {
+				var color = colors[screen.get2bits(n, j + 1)];
+				if (!color) continue;
+				screen.canvas.fillStyle = color;
+				screen.canvas.fillRect(((x * 16) - (j * 2)) + 14, (y * 16) + (i * 2), 2, 2);
+			}
+		}
+	},
+	
 	/**
 	 * Converts a color code into one of the 16 colors the system supports
 	 * @param {number} c The color code (0-15)
 	 * @returns {string} A name for use by canvas "fillStyle" calls
 	 */
-	getColor: function(c) {
-		switch(c) {
-			case 0: return "black";
-			case 1: return "white";
-			case 2: return "red";
-			case 3: return "lime";
-			case 4: return "blue";
-			case 5: return "cyan";
-			case 6: return "yellow";
-			case 7: return "magenta";
-			case 8: return "gray";
-			case 9: return "silver";
-			case 10: return "darkred";
-			case 11: return "green";
-			case 12: return "navy";
-			case 13: return "teal";
-			case 14: return "gold";
-			case 15: return "purple";
+	getColor: function(ram, c) {
+		var s = screen.paletteRAM + (c * 3);
+		return 'rgb(' + ram[s] + ',' + ram[s + 1] + ',' + ram[s + 2] + ')';
+	},
+	
+	/**
+	 * Gets a 2-bit number from an 8-bit number
+	 * @param {number} n The 8-bit number
+	 * @param {number} h Which bit to get (1-4)
+	 * @returns A number from 0 to 3
+	 * @remarks This is for multi-color mode, which
+	 * works similar to the C64 and NES.
+	 * @example var test = 0b00110110;
+	 * if b is 1, this returns 2 (10)
+	 * if b is 2, this returns 1 (01)
+	 * if b is 3, this returns 3 (11)
+	 * if b is 4, this returns 0 (00)
+	 */
+	get2bits: function(n, b) {
+		switch(b) {
+			case 1: n &= 3; break;
+			case 2: n &= 12; break;
+			case 3: n &= 48; break;
+			case 4: n &= 192;
 		}
+		for (var i=1; i<b; i++) n = n >> 2;
+		return n;
 	}
 };
