@@ -23,7 +23,7 @@
  * 	BUTTON_5 = 16
  * 	BUTTON_6 = 32
  * 	BUTTON_7 = 64
- * 	BUTTON_8 = 128*
+ * 	BUTTON_8 = 128
  */
 var input = {
 	init: function(ram, start) {

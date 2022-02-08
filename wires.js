@@ -6,22 +6,27 @@ var MemoryMap = {
 				// 2736-3935 ($0AB0-$0F5F): Graphics (color) RAM
 				// 3936-3983 ($0F60-$0F8F): Graphics (palette) RAM
 				// 3984 ($0F90): Graphics (extra colors) byte
-	tts: 3985,		// 3985-3993 ($0F91-$0F99): Text-to-speech settings
-	sound: 3994,		// 3994-4025 ($0F9A-$0FB9): Sound RAM (placeholder)
-	input: 5000,		// ????-???? ($????-$????): Input RAM (the iCade's controls)
-	random: 6000,		// ???? Pseudo random number generator (placeholder)
-	storage: 7000,		// 4018-???? ($0FB2-$????): Storage on the machine (localStorage)
-	gameCode: 8000,	// ????-???? End-developers' game code starts here
+	tts: 3985,		// 3985-3992 ($0F91-$0F98): Text-to-speech settings
+	sound: 3993,		// 3993-4024 ($0F99-$0FB8): Sound RAM (placeholder)
+	timer: 4025,		// 4025-4028 ($0FB9-$0FBC): Timer
+	input: 4029,		// 4029-4030 ($0FBD-$0FBE): Input RAM (the iCade's controls)
+	storage: 4032,		// 4031-4039 ($0FBF-$0FC7): Storage on the machine (localStorage)
+	random: 4040,		// 4040 ($0FC8): Pseudo random number generator (placeholder)
+	modem: 4041,		// 4041-4048 ($0FC9-$0CFCF): End-developers' game code starts here
+	gameCode: 4048,		// 4048-65535 ($0FD0-$FFFF): End-developers' game code starts here
 };
 window.onload = function() {
 	js6502.init(MemoryMap.random);
 	js6502.onReset = function() {
 		sound.reset(js6502.ram);
 		screen.reset(js6502.ram);
+		timer.reset(js6502.ram);
 	};
 	input.init(js6502.ram, MemoryMap.input);
 	screen.init(js6502.ram, MemoryMap.screen, 240, 320);
 	tts.init(js6502.ram, MemoryMap.tts);
+	timer.init(js6502.ram, MemoryMap.timer);
+	modem.init(js6502.ram, MemoryMap.modem);
 	screen.canvas.canvas.onclick = disk.load;
 	var soundOn = 0;
 	disk.onLoad = function(data) {
@@ -37,5 +42,6 @@ window.onload = function() {
 		js6502.cpu.step();
 		tts.step(js6502.ram);
 		sound.step(js6502.ram);
+		timer.step(js6502.ram, 10);
 	}, 10);
 };

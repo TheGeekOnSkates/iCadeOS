@@ -2,11 +2,64 @@
 /* MEMORY MAP                                                                 */
 /******************************************************************************/
 
-CHARACTER_RAM =		$0200
-SCREEN_RAM =		$0600
-COLOR_RAM =		$0AB0
-INPUT_DPAD =		$A000	/* For now */
-INPUT_BUTTONS =		$A001	/* For now */
+GRAPHICS_CHARACTER_RAM =	$0200
+GRAPHICS_SCREEN_RAM =		$0600
+GRAPHICS_COLOR_RAM =		$0AB0
+GRAPHICS_EXTRA_COLORS =		$0F90
+TTS_RATE =			$0F91
+TTS_PITCH =			$0F92
+TTS_VOLUME =			$0F93
+TTS_STATUS =			$0F94
+TTS_BUFFER_START =		$0F95
+TTS_BUFFER_END =		$0F97
+SOUND_VOICE1_WAVE =		$0F99
+SOUND_VOICE1_VOLUME =		$0F9A
+SOUND_VOICE1_NOTE =		$0F9B
+SOUND_VOICE1_PAN =		$0F9C
+SOUND_VOICE2_WAVE =		$0F9D
+SOUND_VOICE2_VOLUME =		$0F9E
+SOUND_VOICE2_NOTE =		$0F9F
+SOUND_VOICE2_PAN =		$0FA0
+SOUND_VOICE3_WAVE =		$0FA1
+SOUND_VOICE3_VOLUME =		$0FA2
+SOUND_VOICE3_NOTE =		$0FA3
+SOUND_VOICE3_PAN =		$0FA4
+SOUND_VOICE4_WAVE =		$0FA5
+SOUND_VOICE4_VOLUME =		$0FA6
+SOUND_VOICE4_NOTE =		$0FA7
+SOUND_VOICE4_PAN =		$0FA8
+SOUND_VOICE5_WAVE =		$0FA9
+SOUND_VOICE5_VOLUME =		$0FAA
+SOUND_VOICE5_NOTE =		$0FAB
+SOUND_VOICE5_PAN =		$0FAC
+SOUND_VOICE6_WAVE =		$0FAD
+SOUND_VOICE6_VOLUME =		$0FAE
+SOUND_VOICE6_NOTE =		$0FAF
+SOUND_VOICE6_PAN =		$0FB0
+SOUND_VOICE7_WAVE =		$0FB1
+SOUND_VOICE7_VOLUME =		$0FB2
+SOUND_VOICE7_NOTE =		$0FB3
+SOUND_VOICE7_PAN =		$0FB4
+SOUND_VOICE8_WAVE =		$0FB5
+SOUND_VOICE8_VOLUME =		$0FB6
+SOUND_VOICE8_NOTE =		$0FB7
+SOUND_VOICE8_PAN =		$0FB8
+TIMER_HOURS =			$0FB9
+TIMER_MINUTES =			$0FBA
+TIMER_SECONDS =			$0FBB
+TIMER_SPLIT_SECONDS =		$0FBC
+INPUT_DPAD =			$0FBD
+INPUT_BUTTONS =			$0FBE
+STORAGE_KEY_START =		$0FBF
+STORAGE_KEY_END =		$0FC1
+STORAGE_VALUE_START =		$0FB3
+STORAGE_VALUE_END =		$0FC5
+STORAGE_STATUS =		$0FC7
+RANDOM =			$0FC8
+MODEM_STATUS =			$0FC9
+MODEM_RESPONSE_CODE =		$0FCA
+MODEM_BUFFER_START =		$0FCC
+MODEM_BUFFER_END =		$0FCE
 
 
 /******************************************************************************/
@@ -225,3 +278,60 @@ BG_PURPLE =		$0F
 FG_PURPLE =		$F0
 BG_VIOLET =		$0F
 FG_VIOLET =		$F0
+
+
+/*****************************************************************************/
+/* SOUND CHIP CONSTANTS                                                      */
+/*****************************************************************************/
+
+/* Wave forms */
+WAVE_SQUARE =		$00
+WAVE_TRIANGLE = 	$01
+WAVE_SAWTOOTH =		$02
+WAVE_SINE =		$03
+
+/* Musical notes */
+NOTE_C0 = 		$00
+NOTE_CS0 =		$01
+NOTE_D0 =		$02
+NOTE_DS0 =		$03
+NOTE_E0 =		$04
+NOTE_F0 =		$05
+NOTE_FS0 =		$06
+NOTE_G0 =		$07
+NOTE_GS0 =		$08
+NOTE_A0 =		$09
+NOTE_AS0 =		$0A
+NOTE_B0 =		$0B
+NOTE_C1 =		$0C
+NOTE_CS1 =		$0D
+NOTE_D1 =		$0E
+NOTE_DS1 =		$0F
+NOTE_E1 =		$10
+NOTE_F1 =		$11
+NOTE_FS1 =		$12
+NOTE_G1 =		$13
+NOTE_GS1 =		$14
+NOTE_A1 =		$15
+NOTE_AS1 =		$16
+NOTE_B1 =		$17
+NOTE_C2 =		$18
+/* TO-DO: Finish note constants all the way up to 108 */
+
+
+/*****************************************************************************/
+/* INPUT CONSTANTS                                                      */
+/*****************************************************************************/
+
+JOYSTICK_UP = 1
+JOYSTICK_DOWN = 2
+JOYSTICK_LEFT = 4
+JOYSTICK_RIGHT = 8
+BUTTON_1 = 1
+BUTTON_2 = 2
+BUTTON_3 = 4
+BUTTON_4 = 8
+BUTTON_5 = 16
+BUTTON_6 = 32
+BUTTON_7 = 64
+BUTTON_8 = 128
