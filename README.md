@@ -22,20 +22,18 @@ At the code level, each script emulates a different thing that would actually ex
 * **The sound chips:** In previous 8-bit projects I've built, I've had 4 to 8 independently programmable sound "voices" (and also text-to-speech); I plan to include at least those features in iCadeOS.  But ideally, I'd like to learn how ADSR works (on the C64) and see if I can add that functionality.  I've seen JS libraries that can do that, so if it's not a resource-hog it would sure make the sound a lot better.  And **MAYBE** even samples - but again, not likely (lol)
 * **A way to load ROMs:** Unlike other 80s game systems, arcade cabinets didn't have cartridges or floppy drives - at least, none that us kids could see.  Here's where iCadeOS is different.  Because it's open-source - and because developers will want to actually test their code - I need a way to load games.  I have a few ideas on this, some I've used before, others I've seen on other web emulators.
 
+-----------------------------------------------------------------------------------------------
+
 #### Level 1 to-do's:
 
 ##### "World 1-1": Graphics and input
 
-* Get sprites working (collision registers would be nice, lol)
 * **BOSS BATTLE:** Update my Assembly program to use multi-color mode, sprites, a redefined character or two and a different color or two
 
 
 ##### "World 1-2": Sound and speech
 
-* Re-add my old sound system
-* Learn ADSR and see if I can get it working on the JS side
-* Re-add my old text-to-speech engine and make sure that's working
-* Idea: Research how to convert samples to a byte array and playing them from a byte array.  Might be too much work for a gimmicky feature (both for me and for other programmers who might build for this)
+* Learn ADSR and/or 8-bit noise and see if I can get those things working
 * **BOSS BATTLE:** Build an Assembly program that uses sound and speech - ideally both music AND sound effects.
 
 

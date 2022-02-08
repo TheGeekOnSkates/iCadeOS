@@ -23,7 +23,9 @@ var tts = {
 	 */
 	step: function(ram) {
 		// Update the settings
+		// If TTS is off, do nothing
 		tts.volume = ram[tts.volumeControl];
+		if (tts.volume == 0) return;
 		tts.rate = ram[tts.rateControl];
 		tts.pitch = ram[tts.pitchControl];
 		
@@ -41,6 +43,7 @@ var tts = {
 		// Get the memory between addresses A and B
 		var str = [];
 		for (var i=start; i<=end; i++) {
+			if (!ram[i]) break;
 			str.push(ram[i]);
 			ram[i] = 0;
 		}
@@ -66,8 +69,6 @@ var tts = {
 	 * @param {Array<number>} The text to speak (copied from memory)
 	 */
 	say: function(ram, data) {
-		// If TTS is off, do nothing
-		if (tts.volume == 0) return;
 		
 		// Stop any speech in progress
 		speechSynthesis.cancel();
@@ -82,9 +83,7 @@ var tts = {
 		s.volume = tts.volume / 100;
 		s.rate = (2 * tts.rate) / 100;
 		s.pitch = tts.pitch / 100;
-		s.onstart = function() {
-			ram[tts.status] = 2;
-		};
+		ram[tts.status] = 2;
 		s.end = function() {
 			ram[tts.status] = 0;
 		};

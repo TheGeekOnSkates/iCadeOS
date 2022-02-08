@@ -29,7 +29,6 @@ var sound = {
 	 */
 	init: function(ram, start) {
 		// Create the synth, volume and pan components
-		// TO-DO: If I can ever figure out 8-bit noise, add noise generators
 		sound.start = start;
 		sound.audio = new (AudioContext || window.webkitaudioContext)();
 		for (let i=0; i<8; i++) {
@@ -56,6 +55,7 @@ var sound = {
 	 * @param {Uint8Array} ram The memoey used to store sound settings
 	 */
 	step: function(ram) {
+		if (!sound.start) return;
 		if (sound.osc.length < 8) sound.init(ram, sound.start);
 		for (let i=0; i<8; i++) {
 			// Set the wave form
