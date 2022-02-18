@@ -2,25 +2,56 @@
  PROCESSOR 6502
  include "iCadeOS.s"
 
-	JSR SETUP_CHARS
-	JSR SETUP_ARROWS
+/******************************************************************************/
+/* INITIAL SETUP                                                              */
+/******************************************************************************/
+
+	/* Copy my button characters into character RAM */
+	LDA #<ONE
+	LDY #>ONE
+	JSR COPY_CHARS
+	
+	/* Copy my arrow characters into character RAM */
+	LDA #<ARROWS
+	LDY #>ARROWS
+	JSR COPY_ARROWS
+	
+	/* Make the letters in the arrows a blue that's almost white */
+	LDA #$80
+	STA GRAPHICS_PALETTE_RAM + 9
+	STA GRAPHICS_PALETTE_RAM + 10
+	LDA #$FF
+	STA GRAPHICS_PALETTE_RAM + 11
+	
+	/* Make the tip of the arrow a very basic blue (totally unnecessary since blue is a default color, just testing this functionality) */
+	LDA #$00
+	STA GRAPHICS_PALETTE_RAM + 15
+	STA GRAPHICS_PALETTE_RAM + 16
+	LDA #$FF
+	STA GRAPHICS_PALETTE_RAM + 17
+	
+	/* Make the rest of the arrow (the background) a very dark blue */
+	LDA #$00
+	STA GRAPHICS_PALETTE_RAM + 36
+	STA GRAPHICS_PALETTE_RAM + 37
+	LDA #$30
+	STA GRAPHICS_PALETTE_RAM + 38
+	
+	/* And set up the characters we want in screen RAM */
 	JSR SETUP_SCREEN
+
+
+
+/******************************************************************************/
+/* OTHER STUFF                                                                */
+/******************************************************************************/
+
+/* Main loop */
 LOOP:
 	JSR READ_DPAD
 	JSR READ_BUTTONS
 	JMP LOOP
 
-/* Redefines the characters to use the graphics I want */
-SETUP_CHARS:
-	LDA #<ONE
-	LDY #>ONE
-	JSR COPY_CHARS
-	RTS
-SETUP_ARROWS:
-	LDA #<ARROWS
-	LDY #>ARROWS
-	JSR COPY_ARROWS
-	RTS
 
 /* Draw the graphics on the screen, black-on-black */
 SETUP_SCREEN:
@@ -107,7 +138,11 @@ SETUP_SCREEN:
 	/* Update the color RAM for the arrow keys, but not the screen chars */
 	LDA #BG_DARK_BLUE + #FG_YELLOW
 	STA GRAPHICS_EXTRA_COLORS
-	LDA #BG_MAGENTA
+	LDA #BG_GREEN
+	STA GRAPHICS_COLOR_RAM + 94
+	STA GRAPHICS_COLOR_RAM + 95
+	STA GRAPHICS_COLOR_RAM + 124
+	STA GRAPHICS_COLOR_RAM + 125
 	STA GRAPHICS_COLOR_RAM + 152
 	STA GRAPHICS_COLOR_RAM + 153
 	STA GRAPHICS_COLOR_RAM + 182
@@ -116,7 +151,10 @@ SETUP_SCREEN:
 	STA GRAPHICS_COLOR_RAM + 157
 	STA GRAPHICS_COLOR_RAM + 186
 	STA GRAPHICS_COLOR_RAM + 187
-	/* Left off here - need to do this for the other arrow keys */
+	STA GRAPHICS_COLOR_RAM + 214
+	STA GRAPHICS_COLOR_RAM + 215
+	STA GRAPHICS_COLOR_RAM + 244
+	STA GRAPHICS_COLOR_RAM + 245
 	RTS
 
 LEFT_UP:
@@ -488,3 +526,4 @@ ARROWS:
 	BYTE 252,124,92,220,220,92,124,252
 	BYTE 191,191,175,47,43,11,10,2
 	BYTE 254,254,250,248,232,224,160,128
+

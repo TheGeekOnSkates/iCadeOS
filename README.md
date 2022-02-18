@@ -26,11 +26,6 @@ At the code level, each script emulates a different thing that would actually ex
 
 #### Level 1 to-do's:
 
-##### "World 1-1": Graphics and input
-
-* **BOSS BATTLE:** Update my Assembly program to use multi-color mode, sprites, a redefined character or two and a different color or two
-
-
 ##### "World 1-2": Sound and speech
 
 * Learn ADSR and/or 8-bit noise and see if I can get those things working
