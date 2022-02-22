@@ -28,8 +28,7 @@ At the code level, each script emulates a different thing that would actually ex
 
 ##### "World 1-2": Sound and speech
 
-* Learn ADSR and/or 8-bit noise and see if I can get those things working
-* **BOSS BATTLE:** Build an Assembly program that uses sound and speech - ideally both music AND sound effects.
+* **BOSS BATTLE:** Mod my Assembly program from World 1-1 to use sound and speech
 
 
 ##### "World 1-3": Network and local storage

@@ -13,7 +13,10 @@ var MemoryMap = {
 	storage: 4032,		// 4031-4039 ($0FBF-$0FC7): Storage on the machine (localStorage)
 	random: 4040,		// 4040 ($0FC8): Pseudo random number generator (placeholder)
 	modem: 4041,		// 4041-4048 ($0FC9-$0CFCF): End-developers' game code starts here
-	gameCode: 4048,		// 4048-65535 ($0FD0-$FFFF): End-developers' game code starts here
+	error: 4048,		// 4048 ($0FD0): Last system error
+				// 0 = No error
+				// 1 = Invalid sound type (valid values are 0-6)
+	gameCode: 4049,		// 4049-65535 ($0FD1-$FFFF): End-developers' game code starts here
 };
 window.onload = function() {
 	js6502.init(MemoryMap.random);
@@ -22,6 +25,9 @@ window.onload = function() {
 		screen.reset(js6502.ram);
 		timer.reset(js6502.ram);
 	};
+	sound.onError = function(code) {
+		js6502.ram[MemoryMap.error] = code;
+	}
 	input.init(js6502.ram, MemoryMap.input);
 	screen.init(js6502.ram, MemoryMap.screen, 240, 320);
 	tts.init(js6502.ram, MemoryMap.tts);

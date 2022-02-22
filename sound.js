@@ -20,6 +20,9 @@ var sound = {
 	osc: [],	/* stores 8 "OscillatorrNode" objects */
 	vol: [],	/* stores 8 "GainNode" objects */
 	pan: [],	/* stores 8 "PannerNode" objects */
+	wn: [],		/* Stores 8 "white noise" objects */
+	bn: [],		/* Stores 8 "brown noise" objects */
+	pn: [],		/* Stores 8 "pink noise" objects */
 	
 	/**
 	 * Initial setup
@@ -35,6 +38,9 @@ var sound = {
 			sound.osc[i] = sound.audio.createOscillator();
 			sound.vol[i] = sound.audio.createGain();
 			sound.pan[i] = sound.audio.createStereoPanner();
+			sound.wn[i] = sound.WhiteNoise();
+			sound.bn[i] = sound.BrownNoise();
+			sound.pn[i] = sound.PinkNoise();
 
 			// "Wire them up" (except for noise, for now)
 			sound.osc[i].connect(sound.vol[i]);
@@ -65,10 +71,51 @@ var sound = {
 			// Okay seriously tho, 32 bytes for controlling sound on a machine with 64K is not that bad.
 			// And this "sound card" is already way more powerful than what most 8-bit computers were capable of (except for i.e. the C64's SID chip lol).
 			switch(ram[sound.start + (i * 4)]) {
-				case 0: sound.osc[i].type = "square"; break;
-				case 1: sound.osc[i].type = "triangle"; break;
-				case 2: sound.osc[i].type = "sawtooth"; break;
-				case 3: sound.osc[i].type = "sine"; break;
+				case 0:
+					sound.wn[i].disconnect();
+					sound.bn[i].disconnect();
+					sound.pn[i].disconnect();
+					sound.osc[i].connect(sound.vol[i]);
+					sound.osc[i].type = "square";
+					break;
+				case 1:
+					sound.wn[i].disconnect();
+					sound.bn[i].disconnect();
+					sound.pn[i].disconnect();
+					sound.osc[i].connect(sound.vol[i]);
+					sound.osc[i].type = "triangle";
+					break;
+				case 2:
+					sound.wn[i].disconnect();
+					sound.bn[i].disconnect();
+					sound.pn[i].disconnect();
+					sound.osc[i].connect(sound.vol[i]);
+					sound.osc[i].type = "sawtooth";
+					break;
+				case 3:
+					sound.wn[i].disconnect();
+					sound.bn[i].disconnect();
+					sound.pn[i].disconnect();
+					sound.osc[i].connect(sound.vol[i]);
+					sound.osc[i].type = "sine";
+					break;
+				case 4:
+					sound.wn[i].connect(sound.vol[i]);
+					sound.bn[i].disconnect();
+					sound.pn[i].disconnect();
+					sound.osc[i].disconnect();
+				case 5:
+					sound.wn[i].disconnect();
+					sound.bn[i].connect(sound.vol[i]);
+					sound.pn[i].disconnect();
+					sound.osc[i].disconnect();
+				case 6:
+					sound.wn[i].disconnect();
+					sound.bn[i].disconnect();
+					sound.pn[i].connect(sound.vol[i]);
+					sound.osc[i].disconnect();
+				default:
+					sound.onError(1);
 			}
 			
 			// Set the volume
@@ -93,6 +140,9 @@ var sound = {
 	 * Creates a "white noise" generator
 	 * @return A custom audio component that can be
 	 * connected to a volume ("gain") node
+	 * @remarks This, and also BrownNoise and PinkNoise, were
+	 * modded from this amazing tutorial (open-source too btw):
+	 * https://noisehack.com/generate-noise-web-audio-api/
 	 */
 	WhiteNoise: function() {
 		var bufferSize = 2 * sound.audio.sampleRate,
@@ -169,5 +219,8 @@ var sound = {
 		for (let i=sound.start; i<sound.start+32; i++) {
 			ram[sound.start + i] = 0;
 		}
-	}
+	},
+	
+	/** Users of this sound system should override this function */
+	onError: function(code) {}
 };
