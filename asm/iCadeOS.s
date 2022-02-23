@@ -12,7 +12,7 @@ TTS_PITCH =			$0F92
 TTS_VOLUME =			$0F93
 TTS_STATUS =			$0F94
 TTS_BUFFER_START =		$0F95
-TTS_BUFFER_END =		$0F97
+/* TTS_BUFFER_END =		$0F97 */
 SOUND_VOICE1_WAVE =		$0F99
 SOUND_VOICE1_VOLUME =		$0F9A
 SOUND_VOICE1_NOTE =		$0F9B
@@ -232,6 +232,18 @@ CHAR_BANG =			$7F
 
 
 
+
+/*****************************************************************************/
+/* SYSTEM ERROR CODES                                                        */
+/*****************************************************************************/
+
+ERROR_NONE =		$00	/* No error */
+ERROR_INVALID_WAVE =	$01	/* Invalid sound wave type (valid values are
+				the WAVE_* constants defined below) */
+ERROR_INVALID_NOTE =	$02	/* Invalid sound note ("frequency"); valid
+				values are the NOTE_* constants below */
+
+
 /******************************************************************************/
 /* SCREEN COLOR CONSTANTS                                                     */
 /******************************************************************************/
@@ -290,6 +302,9 @@ WAVE_SQUARE =		$00
 WAVE_TRIANGLE = 	$01
 WAVE_SAWTOOTH =		$02
 WAVE_SINE =		$03
+WAVE_WHITE_NOISE =	$04
+WAVE_BROWN_NOISE =	$05
+WAVE_PINK_NOISE =	$06
 
 /* Musical notes */
 NOTE_C0 = 		$00
@@ -317,6 +332,25 @@ NOTE_A1 =		$15
 NOTE_AS1 =		$16
 NOTE_B1 =		$17
 NOTE_C2 =		$18
+NOTE_CS2 =		$19
+NOTE_D2 =		$1A
+NOTE_DS2 =		$1B
+NOTE_E2 =		$1C
+NOTE_F2 =		$1D
+NOTE_FS2 =		$1E
+NOTE_G2 =		$1F
+NOTE_GS2 =		$20
+NOTE_A2 =		$21
+NOTE_AS2 =		$22
+NOTE_B2 =		$23
+NOTE_C3 =		$24
+NOTE_CS3 =		$25
+NOTE_D3 =		$26
+NOTE_DS3 =		$27
+NOTE_E3 =		$28
+NOTE_F3 =		$29
+NOTE_FS3 =		$2A
+NOTE_G3 =		$2B
 /* TO-DO: Finish note constants all the way up to 108 */
 
 
@@ -336,3 +370,12 @@ BUTTON_5 = 16
 BUTTON_6 = 32
 BUTTON_7 = 64
 BUTTON_8 = 128
+
+
+/*****************************************************************************/
+/* TEXT-TO-SPEECH (TTS) STATUS CODES                                         */
+/*****************************************************************************/
+
+TTS_NOT_SPEAKING =		0 /* Not speaking */
+TTS_START_SPEAKING =		1 /* Tell the system to start talking immediately, canceling any speech that may already be going on */
+TTS_SPEECH_IN_PROGRESS =	2 /* Speech is currently in progress */

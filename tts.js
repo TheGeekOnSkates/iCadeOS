@@ -13,7 +13,6 @@ var tts = {
 		tts.volumeControl = start + 2;
 		tts.status = start + 3;
 		tts.bufferStart = start + 4;	// 16-bit pointer, 2 bytes
-		tts.bufferEnd = start + 6;	// same, total 8 bytes
 		tts.reset(ram);
 	},
 	
@@ -37,12 +36,11 @@ var tts = {
 		if (ram[tts.status] != 1) return;
 		
 		// Otherwise, we want to start talking; first, update the status byte to "speech in progress"
-		var start = tts._buf(ram[tts.bufferStart], ram[tts.bufferStart + 1]),
-			end = tts._buf(ram[tts.bufferEnd], ram[tts.bufferEnd + 1]);
+		var start = tts._buf(ram[tts.bufferStart], ram[tts.bufferStart + 1]);
 		
-		// Get the memory between addresses A and B
+		// Get the memory between addresses A and the max, 65536 bytes
 		var str = [];
-		for (var i=start; i<=end; i++) {
+		for (var i=start; i<65536; i++) {
 			if (!ram[i]) break;
 			str.push(ram[i]);
 			ram[i] = 0;
@@ -60,6 +58,8 @@ var tts = {
 		ram[tts.rateControl] = 50;
 		ram[tts.pitchControl] = 50;
 		ram[tts.volumeControl] = 100;
+		//ram[tts.bufferStart] = 0;
+		//ram[tts.bufferStart + 1] = 0;
 		ram[tts.status] = 0;
 	},
 	

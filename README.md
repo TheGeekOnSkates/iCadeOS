@@ -28,6 +28,7 @@ At the code level, each script emulates a different thing that would actually ex
 
 ##### "World 1-2": Sound and speech
 
+* Finish debugging TTS, and update the memory map (we can actually save 2 bytes of RAM (and a lot of unnecessary math hoops to jump through) using a zero at the end of strings to be spoke (like a NULL-terminator in C) vs the old way w/the buffer end pointer.
 * **BOSS BATTLE:** Mod my Assembly program from World 1-1 to use sound and speech
 
 
