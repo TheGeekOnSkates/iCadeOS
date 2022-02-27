@@ -26,12 +26,6 @@ At the code level, each script emulates a different thing that would actually ex
 
 #### Level 1 to-do's:
 
-##### "World 1-2": Sound and speech
-
-* Finish debugging TTS; whatever is going on, it seems to be on the JS side.  I can't figure it out tonight... because {JS}, when I load the program, it seems the TTS loop just... stops.  Reasons.  Clunky junky jacked-up JavaScript lol.  I might try and write a separate program to just test speech without my other stuff.  But my Assembly code is doing everything right (in theory) to make the TTS work.  It moves the buffer start pointer to the right place and sets the status byte to the right value... but due to {mysterious oop-shut-downage} it just... doesn't work.  :P
-* **BOSS BATTLE:** Mod my Assembly program from World 1-1 to use sound and speech
-
-
 ##### "World 1-3": Network and local storage
 
 * Set up my localStorage wrapper
