@@ -5,7 +5,7 @@ var tts = {
 	 * Initial setup
 	 * @param {Uint8Array} ram The memory to be used to store TTS settings
 	 * @param {number} start The memory address where the settings should go
-	 * @remarks The TTS engine requires 8 bytes + whatever buffer size you give it to speak stuff
+	 * @remarks The TTS engine requires 6 bytes + whatever buffer size you give it to speak stuff
 	 */
 	init: function(ram, start) {
 		tts.rateControl = start;
@@ -58,8 +58,8 @@ var tts = {
 		ram[tts.rateControl] = 50;
 		ram[tts.pitchControl] = 50;
 		ram[tts.volumeControl] = 100;
-		//ram[tts.bufferStart] = 0;
-		//ram[tts.bufferStart + 1] = 0;
+		ram[tts.bufferStart] = 0;
+		ram[tts.bufferStart + 1] = 0;
 		ram[tts.status] = 0;
 	},
 	

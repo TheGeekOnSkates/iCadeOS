@@ -28,7 +28,7 @@ At the code level, each script emulates a different thing that would actually ex
 
 ##### "World 1-2": Sound and speech
 
-* Finish debugging TTS, and update the memory map (we can actually save 2 bytes of RAM (and a lot of unnecessary math hoops to jump through) using a zero at the end of strings to be spoke (like a NULL-terminator in C) vs the old way w/the buffer end pointer.
+* Finish debugging TTS; whatever is going on, it seems to be on the JS side.  I can't figure it out tonight... because {JS}, when I load the program, it seems the TTS loop just... stops.  Reasons.  Clunky junky jacked-up JavaScript lol.  I might try and write a separate program to just test speech without my other stuff.  But my Assembly code is doing everything right (in theory) to make the TTS work.  It moves the buffer start pointer to the right place and sets the status byte to the right value... but due to {mysterious oop-shut-downage} it just... doesn't work.  :P
 * **BOSS BATTLE:** Mod my Assembly program from World 1-1 to use sound and speech
 
 

@@ -6,12 +6,13 @@ var MemoryMap = {
 				// 2736-3935 ($0AB0-$0F5F): Graphics (color) RAM
 				// 3936-3983 ($0F60-$0F8F): Graphics (palette) RAM
 				// 3984 ($0F90): Graphics (extra colors) byte
-	tts: 3985,		// 3985-3992 ($0F91-$0F98): Text-to-speech settings
-	sound: 3993,		// 3993-4024 ($0F99-$0FB8): Sound RAM (placeholder)
-	timer: 4025,		// 4025-4028 ($0FB9-$0FBC): Timer
-	input: 4029,		// 4029-4030 ($0FBD-$0FBE): Input RAM (the iCade's controls)
-	storage: 4032,		// 4031-4039 ($0FBF-$0FC7): Storage on the machine (localStorage)
-	random: 4040,		// 4040 ($0FC8): Pseudo random number generator (placeholder)
+	tts: 3985,		// 3985-3990 ($0F91-$0F96): Text-to-speech settings
+	sound: 3991,		// 3991-4022 ($0F97-$0FB6): Sound RAM
+	input: 4023,		// 4023-4024 ($0FB7-$0FB8): Input RAM (the iCade's controls)
+	random: 4025,		// 4025 ($0FB9): Pseudo random number generator (placeholder)
+	timer: 4026,		// 4026-4029 ($0FBA-$0FBD): Timer
+	/* Everything after this point is still a work in progress :) */
+	storage: 4030,		// 4030-4039 ($0FBF-$0FC7): Storage on the machine (localStorage)
 	modem: 4041,		// 4041-4048 ($0FC9-$0CFCF): End-developers' game code starts here
 	error: 4048,		// 4048 ($0FD0): Last system error
 				// 0 = No error
