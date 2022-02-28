@@ -11,9 +11,9 @@ var MemoryMap = {
 	input: 4023,		// 4023-4024 ($0FB7-$0FB8): Input RAM (the iCade's controls)
 	random: 4025,		// 4025 ($0FB9): Pseudo random number generator (placeholder)
 	timer: 4026,		// 4026-4029 ($0FBA-$0FBD): Timer
+	storage: 4030,		// 4030-4032 ($0FBE-$0FC1): Storage on the machine (localStorage)
 	/* Everything after this point is still a work in progress :) */
-	storage: 4030,		// 4030-4039 ($0FBF-$0FC7): Storage on the machine (localStorage)
-	modem: 4041,		// 4041-4048 ($0FC9-$0CFCF): End-developers' game code starts here
+	modem: 4033,		// 4033-4048 ($0FC2-$0CFCF): End-developers' game code starts here
 	error: 4048,		// 4048 ($0FD0): Last system error
 				// 0 = No error
 				// 1 = Invalid sound type (valid values are 0-6)
@@ -24,6 +24,7 @@ window.onload = function() {
 	js6502.onReset = function() {
 		sound.reset(js6502.ram);
 		screen.reset(js6502.ram);
+		storage.reset(js6502.ram);
 		timer.reset(js6502.ram);
 	};
 	sound.onError = function(code) {
@@ -32,6 +33,7 @@ window.onload = function() {
 	input.init(js6502.ram, MemoryMap.input);
 	screen.init(js6502.ram, MemoryMap.screen, 240, 320);
 	tts.init(js6502.ram, MemoryMap.tts);
+	storage.init(js6502.ram, MemoryMap.storage);
 	timer.init(js6502.ram, MemoryMap.timer);
 	modem.init(js6502.ram, MemoryMap.modem);
 	screen.canvas.canvas.onclick = disk.load;
@@ -49,6 +51,7 @@ window.onload = function() {
 		js6502.cpu.step();
 		tts.step(js6502.ram);
 		sound.step(js6502.ram);
+		storage.step(js6502.ram);
 		timer.step(js6502.ram, 10);
 	}, 10);
 };
