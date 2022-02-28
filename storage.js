@@ -45,33 +45,76 @@ var storage = {
 		switch(ram[storage.status]) {
 			case 0: case 5: return;
 			case 1:
-				// TO-DO: Set the key
+				// Set the key
+				try {
+					ram[storage.status] = 5;
+					storage.key = storage._getBuffer(ram);
+					ram[storage.status] = 0;
+				}
+				catch(e) { storage.onError(2); }
 				break
 			case 2:
-				// TO-DO: Get the value of key
+				// Get the value of storage.key
+				if (storage.key == "") {
+					storage.onError(3);
+					return;
+				}
+				try {
+					ram[storage.status] = 5;
+					var address = ram[storage.bufferStart + 1] * 0x100 + ram[storage.bufferStart],
+						data = localStorage.getItem(storage.key);
+					if (!data) {	// null or empty
+						ram[address] = 0; return;
+					}
+					for (var i=address; i<address + data.length; i++) {
+						ram[i] = data.charCodeAt(i);
+					}
+					ram[storage.status] = 0;
+				}
+				catch(e) { storage.onError(2); }
 				break
 			case 3:
-				// TO-DO: Get the value
+				// Set the value of storage.key
+				if (storage.key == "") {
+					storage.onError(3);
+					return;
+				}
+				try {
+					ram[storage.status] = 5;
+					localStorage.setItem(storage.key, storage._getBuffer(ram));
+					ram[storage.status] = 0;
+				}
+				catch(e) { storage.onError(2); }
 				break
-			case 1:
-				// TO-DO: Set the value
+			case 4:
+				// TO-DO: Remove the item named storage.key
+				if (storage.key == "") {
+					storage.onError(3);
+					return;
+				}
+				try {
+					ram[storage.status] = 5;
+					localStorage.removeItem(storage.key);
+					ram[storage.status] = 0;
+				}
+				catch(e) { storage.onError(2); }
 				break
 		}
 	},
 
 	/**
-	 * 
+	 * Reads the contents of the buffer until it finds a zero or hits the end of RAM
 	 * @param {Uint8Array} ram The memory object used in reading/writing
 	 */
-	load: function(ram) {
-		
+	_getBuffer: function(ram) {
+		var str = "", address = ram[storage.bufferStart + 1] * 0x100 + ram[storage.bufferStart];
+		for (var i=address; i<65536; i++) {
+			if (ram[i] == 0) break;
+			str += String.fromCharCode(ram[i]);
+		}
+		return str;
 	},
 
-	/**
-	 * 
-	 * @param {Uint8Array} ram The memory object used in reading/writing
-	 */
-	save: function(ram) {
-		
-	},
+	/** wires.js should override this */
+	onError: function(code) {},
 };

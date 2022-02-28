@@ -28,13 +28,8 @@ At the code level, each script emulates a different thing that would actually ex
 
 ##### "World 1-3": Network and local storage
 
-* Set up my localStorage wrapper
-* If I haven't already used up too much RAM, re-add my old "modem.js" from another project (I've been on the fence about it, but I kinda like the idea for people who want to store their high scores online)
-* Idea: auto-run from URL (like the Commodore PET emulator)?  Might be really hard, but might be totally awesome and totally worth it. :)
+* Test modem.js - try it in a local web server, maybe a little Bottle server
 * **BOSS BATTLE:** Write an Assembly program that uses the localStorage and modem.js if I use it.
-
-Like the other boss battles, it passes if it works on the actual iCade.
-
 
 ##### "World 1-4": Misc. and Polish
 
@@ -43,6 +38,7 @@ Like the other boss battles, it passes if it works on the actual iCade.
 * Create a nicer background on startup; maybe code a program that puts some instructions on there or something
 * Research which license to use - I really want UNLICENSE, but the 6502 piece was created under something else
 * Test the canvas with screen readers and make sure it's accessible - this system could be used to create audio games (and in fact some of the code it's running was originally built for that) so I want to make sure people who want to can do that.
+* Idea: auto-run from URL (like the Commodore PET emulator)?  One wrinkle tho: sound.  Some browsers don't allow sound unless the user pushes a button.  So maybe in wires.js, if the URL contains program code, just put a "start game" button on it or something...
 * Minify the HTML, JS, and CSS
 * **MINI-BOSS:** Write an Assembly program that uses the timer
 * **MINI-BOSS:** Finalize my memory map in wires.js, add comments to all JS code I haven't yet, and update the code to include whatever comments the license requires

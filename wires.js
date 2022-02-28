@@ -16,7 +16,9 @@ var MemoryMap = {
 	modem: 4033,		// 4033-4048 ($0FC2-$0CFCF): End-developers' game code starts here
 	error: 4048,		// 4048 ($0FD0): Last system error
 				// 0 = No error
-				// 1 = Invalid sound type (valid values are 0-6)
+				// 1 = Sound error: Invalid sound type (valid values are 0-6)
+				// 2 = Storage error: localStorage is not supported
+				// 3 = Storage error: key not set
 	gameCode: 4049,		// 4049-65535 ($0FD1-$FFFF): End-developers' game code starts here
 };
 window.onload = function() {
